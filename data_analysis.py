@@ -57,9 +57,10 @@ def create_custom_stopwords():
 
     for i in range(0, len(word_files)):
         with open(f'word_list/{word_files[i]}', 'r') as file:
-            for line in file:
-                word = line.strip()
-                if word: stopwords.add(word.lower())
+            if word_files[i].lower().endswith(".txt"):
+                for line in file:
+                    word = line.strip()
+                    if word: stopwords.add(word.lower())
     
     for word in list(wordList):
         stopwords.add(word.lower())
@@ -75,11 +76,12 @@ def get_entity_frequency():
 
     for i in range(0, len(medical_insights_transcript_files)):
         with open(f'json_files/{medical_insights_transcript_files[i]}', 'r') as file:
-            data = json.load(file)
-            entities = data['Entities']
-            for entity in entities:
-                if entity['Text'].lower() not in words_to_omit: 
-                    entity_frequency[entity['Category']][entity['Text']] += 1
+            if medical_insights_transcript_files[i].lower().endswith(".json"):
+                data = json.load(file)
+                entities = data['Entities']
+                for entity in entities:
+                    if entity['Text'].lower() not in words_to_omit: 
+                        entity_frequency[entity['Category']][entity['Text']] += 1
 
     return entity_frequency
 
@@ -93,35 +95,36 @@ def get_statistics(window=0, score_range=None):
         categories_count_per_transcript.append(set())
 
         with open(f'json_files/{medical_insights_transcript_files[i]}', 'r') as file:
-            data = json.load(file)
-            entities = data['Entities']
-            entity_set = get_entities_in_sliding_char_window(entities, window, score_range)
+            if medical_insights_transcript_files[i].lower().endswith(".json"):
+                data = json.load(file)
+                entities = data['Entities']
+                entity_set = get_entities_in_sliding_char_window(entities, window, score_range)
 
-            for j in entity_set:
-                if j['Category'] != 'PROTECTED_HEALTH_INFORMATION': # Exclude PHI
-                    all_scores_in_dataset.append(j['Score'])
+                for j in entity_set:
+                    if j['Category'] != 'PROTECTED_HEALTH_INFORMATION': # Exclude PHI
+                        all_scores_in_dataset.append(j['Score'])
 
-                    all_categories_in_dataset.append(j['Category'])
-                    unique_categories_in_dataset.add(j['Category'])
-                    categories_count_per_transcript[i].add(j['Category'])
+                        all_categories_in_dataset.append(j['Category'])
+                        unique_categories_in_dataset.add(j['Category'])
+                        categories_count_per_transcript[i].add(j['Category'])
 
-                    if j['Category'] not in score_distribution_per_category: score_distribution_per_category[j['Category']] = [];
-                    score_distribution_per_category[j['Category']].append(j['Score'])
-                    
-                    all_types_in_dataset.append(j['Type'])
-                    unique_types_in_dataset.add(j['Type'])  # Add type to the set
-                    types_count_per_transcript[i].add(j['Type'])
+                        if j['Category'] not in score_distribution_per_category: score_distribution_per_category[j['Category']] = [];
+                        score_distribution_per_category[j['Category']].append(j['Score'])
+                        
+                        all_types_in_dataset.append(j['Type'])
+                        unique_types_in_dataset.add(j['Type'])  # Add type to the set
+                        types_count_per_transcript[i].add(j['Type'])
 
-                    if j['Type'] not in score_distribution_per_types: score_distribution_per_types[j['Type']] = [];
-                    score_distribution_per_types[j['Type']].append(j['Score'])
+                        if j['Type'] not in score_distribution_per_types: score_distribution_per_types[j['Type']] = [];
+                        score_distribution_per_types[j['Type']].append(j['Score'])
 
-                    text_length_throughout_dataset.append(len(j['Text']))  # Store the length of the text
-                    
-                    if j['Category'] not in text_length_per_category: text_length_per_category[j['Category']] = [];
-                    text_length_per_category[j['Category']].append(len(j['Text']))
+                        text_length_throughout_dataset.append(len(j['Text']))  # Store the length of the text
+                        
+                        if j['Category'] not in text_length_per_category: text_length_per_category[j['Category']] = [];
+                        text_length_per_category[j['Category']].append(len(j['Text']))
 
-                    if j['Category'] not in text_per_category: text_per_category[j['Category']] = [];
-                    text_per_category[j['Category']].append(j['Text'])
+                        if j['Category'] not in text_per_category: text_per_category[j['Category']] = [];
+                        text_per_category[j['Category']].append(j['Text'])
 
 
     return all_categories_in_dataset, unique_categories_in_dataset, score_distribution_per_category, text_per_category
