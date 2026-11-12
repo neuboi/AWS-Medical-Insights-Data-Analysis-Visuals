@@ -1,0 +1,12 @@
+__pycache__
+
+.vscode
+.venv
+.venv-1
+
+/old
+/word_list
+/img
+
+*.json
+
