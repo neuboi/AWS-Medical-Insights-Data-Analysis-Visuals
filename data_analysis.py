@@ -13,16 +13,18 @@ import matplotlib.pyplot as plt
 import os
 from wordcloud import STOPWORDS
 
-wordList = {
-        'um', 'uh', 'a', 'an', 'and', 'are', 'as', 'at', 'be', 'but', 'by', 'for', 'from', 'has',
-        'have', 'he', 'her', 'his', 'i', 'in', 'is', 'it', 'its', 'me', 'my', 'not',
-        'of', 'on', 'or', 'our', 'she', 'so', 'that', 'the', 'their', 'them', 'they',
-        'this', 'to', 'was', 'we', 'were', 'what', 'with', 'you', 'your',
-    }
-for word in list(wordList):
-    STOPWORDS.add(word.lower())
+AWS_MI_ENTITY_CATEGORIES = [
+        'BEHAVIORAL_ENVIRONMENTAL_SOCIAL',
+        'ANATOMY', 
+        'TEST_TREATMENT_PROCEDURE', 
+        'MEDICAL_CONDITION', 
+        'MEDICATION', 
+        'PROTECTED_HEALTH_INFORMATION', 
+        'TIME_EXPRESSION'
+        ]
 
-files = os.listdir('json_files')
+medical_insights_transcript_files = os.listdir('json_files')
+word_files = os.listdir('word_list')
 
 all_scores_in_dataset = []
 all_categories_in_dataset = []
@@ -41,18 +43,42 @@ score_distribution_per_types = {}
 types_count_per_transcript = []
 categories_count_per_transcript = []
 
+words_to_omit = {}
+
+def create_custom_stopwords():
+    stopwords = STOPWORDS
+
+    wordList = {
+            'um', 'uh', 'a', 'an', 'and', 'are', 'as', 'at', 'be', 'but', 'by', 'for', 'from', 'has',
+            'have', 'he', 'her', 'his', 'i', 'in', 'is', 'it', 'its', 'me', 'my', 'not',
+            'of', 'on', 'or', 'our', 'she', 'so', 'that', 'the', 'their', 'them', 'they',
+            'this', 'to', 'was', 'we', 'were', 'what', 'with', 'you', 'your',
+        }
+
+    for i in range(0, len(word_files)):
+        with open(f'word_list/{word_files[i]}', 'r') as file:
+            for line in file:
+                word = line.strip()
+                if word: stopwords.add(word.lower())
+    
+    for word in list(wordList):
+        stopwords.add(word.lower())
+
+    return stopwords
+
 def get_entity_frequency():
+    words_to_omit = create_custom_stopwords()
     entity_frequency = {}
 
-    for cat in ['BEHAVIORAL_ENVIRONMENTAL_SOCIAL','ANATOMY', 'TEST_TREATMENT_PROCEDURE', 'MEDICAL_CONDITION', 'MEDICATION', 'PROTECTED_HEALTH_INFORMATION', 'TIME_EXPRESSION']:
+    for cat in AWS_MI_ENTITY_CATEGORIES:
         entity_frequency[cat] = Counter()
 
-    for i in range(0, len(files)):
-        with open(f'json_files/{files[i]}', 'r') as file:
+    for i in range(0, len(medical_insights_transcript_files)):
+        with open(f'json_files/{medical_insights_transcript_files[i]}', 'r') as file:
             data = json.load(file)
             entities = data['Entities']
             for entity in entities:
-                if entity['Text'].lower() not in STOPWORDS: 
+                if entity['Text'].lower() not in words_to_omit: 
                     entity_frequency[entity['Category']][entity['Text']] += 1
 
     return entity_frequency
@@ -61,12 +87,12 @@ def get_statistics(window=0, score_range=None):
 
     clear_statistics()
 
-    for i in range(0, len(files)):
+    for i in range(0, len(medical_insights_transcript_files)):
 
         types_count_per_transcript.append(set()) 
         categories_count_per_transcript.append(set())
 
-        with open(f'json_files/{files[i]}', 'r') as file:
+        with open(f'json_files/{medical_insights_transcript_files[i]}', 'r') as file:
             data = json.load(file)
             entities = data['Entities']
             entity_set = get_entities_in_sliding_char_window(entities, window, score_range)
@@ -101,7 +127,10 @@ def get_statistics(window=0, score_range=None):
     return all_categories_in_dataset, unique_categories_in_dataset, score_distribution_per_category, text_per_category
 
 def clear_statistics():
-    global all_scores_in_dataset, all_categories_in_dataset, all_types_in_dataset, text_length_per_category, text_length_throughout_dataset, unique_categories_in_dataset, unique_types_in_dataset, score_distribution_per_category, score_distribution_per_types, types_count_per_transcript, text_per_category, categories_count_per_transcript
+    global all_scores_in_dataset, all_categories_in_dataset, all_types_in_dataset, \
+    text_length_per_category, text_length_throughout_dataset, unique_categories_in_dataset, \
+    unique_types_in_dataset, score_distribution_per_category, score_distribution_per_types, \
+    types_count_per_transcript, text_per_category, categories_count_per_transcript
 
     all_scores_in_dataset = []
     all_categories_in_dataset = []

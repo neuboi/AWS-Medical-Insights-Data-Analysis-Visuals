@@ -31,7 +31,7 @@ An intereactive plot of Medical Insight entity category frequency and confidence
     plt.show()
 
 ## table.py
-An intereactive table of n most frequent words in each category across all medical insights transcripts in `json_files`.
+An intereactive table of n most frequent words in each category across all medical insights transcripts in `json_files`. Uses `google-10000-english-usa.txt` to filter out less specific terms.
 
 **How to use**:
 * Check boxes (left) to choose which categories should be shown.

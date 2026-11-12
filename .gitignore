@@ -5,7 +5,6 @@ __pycache__
 .venv-1
 
 /old
-/word_list
 /img
 
 *.json
