@@ -14,13 +14,13 @@ import os
 from wordcloud import STOPWORDS
 
 AWS_MI_ENTITY_CATEGORIES = [
-        'BEHAVIORAL_ENVIRONMENTAL_SOCIAL',
-        'ANATOMY', 
-        'TEST_TREATMENT_PROCEDURE', 
-        'MEDICAL_CONDITION', 
-        'MEDICATION', 
-        'PROTECTED_HEALTH_INFORMATION', 
-        'TIME_EXPRESSION'
+            'BEHAVIORAL_ENVIRONMENTAL_SOCIAL',
+            'ANATOMY', 
+            'TEST_TREATMENT_PROCEDURE', 
+            'MEDICAL_CONDITION', 
+            'MEDICATION', 
+            'PROTECTED_HEALTH_INFORMATION', 
+            'TIME_EXPRESSION'
         ]
 
 medical_insights_transcript_files = os.listdir('json_files')

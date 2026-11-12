@@ -1,8 +1,6 @@
 # AWS Medical Insights Data Analysis Visuals
 
-A collection of interactive data analysis visuals for AWS Medical Insights.
-
-*To get started, copy your AWS Medical Insights transcripts (JSON) into the folder `json_files`*
+A collection of interactive data analysis visuals for AWS Medical Insights. To get started, copy your AWS Medical Insights transcripts (JSON) into the folder `json_files`
 
 ## main.py
 An intereactive plot of Medical Insight entity category frequency and confidence score distributions across all medical insights transcripts in `json_files`. Includes a word cloud of the text in selected categories
